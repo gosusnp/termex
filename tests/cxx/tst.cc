@@ -135,6 +135,33 @@ void test_searcher() {
     assert(searcher.value() == &test_test);
 }
 
+struct result_builder_type
+{
+    struct result_type
+    {
+        result_type(size_t b, size_t e, int* v) :
+            begin(b), end(e), value(v)
+        { }
+        size_t begin;
+        size_t end;
+        int*   value;
+    };
+    typedef std::list<result_type> result_list_type;
+
+    result_builder_type() :
+        results_(new result_list_type())
+    {}
+    void operator()(size_t b, size_t e, int* v) const
+    {
+        results_->push_back(result_type(b, e, v));
+    }
+
+    result_list_type& operator*() { return *results_; }
+
+protected:
+    result_list_type* results_;
+};
+
 void test_extractor() {
     TernarySearchTree<char, int> tree;
     int test = 1;
@@ -144,11 +171,12 @@ void test_extractor() {
 
     typedef Extractor< TernarySearchTree<char, int> > extractor_type;
     extractor_type extractor(tree);
-    extractor_type::result_list_type results;
+    result_builder_type result_builder;
+    result_builder_type::result_list_type& results = *result_builder;
 
-    extractor.extract(std::string("Test   aoeu test e tes e test   test  o test"), results);
+    extractor.extract(std::string("Test   aoeu test e tes e test   test  o test"), result_builder);
     assert(results.size() == 6);
-    extractor_type::result_list_type::iterator i = results.begin();
+    result_builder_type::result_list_type::iterator i = results.begin();
     assert(i->begin == 0);
     assert(i->end == 4);
     assert(i->value == &test);

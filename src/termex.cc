@@ -56,15 +56,22 @@ PyObject* Termex::get(const PyObject* term) const
         Py_RETURN_NONE;
 }
 
+struct result_builder_type
+{
+    result_builder_type() :
+        results(PyList_New(0))
+    {}
+    void operator()(size_t begin, size_t end, PyObject* value) const
+    {
+        PyList_Append(results,
+                PyTuple_Pack(3, PyInt_FromSsize_t(begin), PyInt_FromSsize_t(end), value));
+    }
+    PyObject* results;
+};
+
 PyObject* Termex::extract(const PyObject* inputstring) const
 {
-    extractor_type::result_list_type extractions;
-    extractor_.extract(PyUnicode_AS_UNICODE(inputstring), extractions);
-    PyObject* results = PyList_New(0);
-    for (extractor_type::result_list_type::const_iterator i = extractions.begin(),
-                                                          i_end = extractions.end();
-        i != i_end; ++i) {
-        PyList_Append(results, PyTuple_Pack(3, PyInt_FromSsize_t(i->begin), PyInt_FromSsize_t(i->end), i->value));
-    }
-    return results;
+    result_builder_type result_builder;
+    extractor_.extract(PyUnicode_AS_UNICODE(inputstring), result_builder);
+    return result_builder.results;
 }
