@@ -26,6 +26,22 @@
 ** python objects
 */
 
+// Specialization of Node destructor to decrement the refcount on
+// the stored values.
+template <>
+Node<Py_UNICODE, PyObject>::~Node()
+{
+    if (key_)          // Only delete lokid_ when key_ is not null
+        delete lokid_; // otherwise, it means that lokid_ is a value_type*
+    else
+    {
+        if (lokid_)
+            Py_DECREF(reinterpret_cast<PyObject*>(lokid_));
+    }
+    delete eqkid_;
+    delete hikid_;
+}
+
 Termex::Termex():
     lexicon_(),
     extractor_(lexicon_)
