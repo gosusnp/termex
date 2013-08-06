@@ -38,8 +38,14 @@ cdef class PyTermex:
     def __dealloc__(self):
         del self.thisptr
     def add(self, term):
+        if not isinstance(term, unicode):
+            raise TypeError("expected unicode")
         return self.thisptr.add(term)
     def get(self, term):
+        if not isinstance(term, unicode):
+            raise TypeError("expected unicode")
         return self.thisptr.get(term)
     def extract(self, inputstring):
+        if not isinstance(inputstring, unicode):
+            raise TypeError("expected unicode")
         return self.thisptr.extract(inputstring)

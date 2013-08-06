@@ -34,3 +34,14 @@ class TestPyTermex(unittest.TestCase):
 
         self.assertEqual(tx.extract(u'aa Test aeu teste'),
                 [(3, 7, set(['tag1']))])
+
+    def test_termex_with_invalid_data(self):
+        tx = PyTermex()
+        with self.assertRaises(TypeError):
+            tx.add('fail')
+        with self.assertRaises(TypeError):
+            tx.add({})
+        with self.assertRaises(TypeError):
+            tx.get('fail')
+        with self.assertRaises(TypeError):
+            tx.extract('fail')
