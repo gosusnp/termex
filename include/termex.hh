@@ -19,52 +19,38 @@
 **    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 **    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef TST_HH
-# define TST_HH
+#ifndef TERMEX_HH
+# define TERMEX_HH
 
-# include "node.hh"
-# include "normalizer.hh"
+# include <Python.h>
+
+# include "tst.hh"
+# include "extractor.hh"
 
 /*
-** TernarySearchTree
+** Exposed Class
 **
-** User end class
+** Handles lexicons and extractor.
 */
-template <typename charT, typename valueT>
-class TernarySearchTree
+class Termex
 {
 public:
-    typedef charT                        char_type;
-    typedef valueT                       value_type;
-    typedef Node<charT, valueT>          node_type;
-    typedef typename node_type::Searcher searcher_type;
+    typedef TernarySearchTree<Py_UNICODE, PyObject> lexicon_type;
+    typedef Extractor<lexicon_type>                 extractor_type;
+    Termex();
+    ~Termex();
 
-    TernarySearchTree() :
-        root_(new node_type(0))
-    { }
-    ~TernarySearchTree()
-    {
-        delete root_;
-    }
-
-    value_type* insert(const char_type* str, value_type* value, bool replace = false)
-    {
-        return root_->insert(Normalizer<char_type>(str), value, replace);
-    }
-
-    value_type* search(const char_type* str) const
-    {
-        return root_->search(Normalizer<char_type>(str));
-    }
-
-    typename node_type::Searcher searcher() const
-    {
-        return root_->searcher();
-    }
+    // Add <term> to the lexicon, returns a set of tags
+    PyObject* add(const PyObject* term);
+    // returns a set of tags of <term>
+    PyObject* get(const PyObject* term) const;
+    // Perform extraction returns a list of [(begin, end, set([tags])), ...]
+    PyObject* extract(const PyObject* inputstring) const;
 
 protected:
-    node_type* root_;
+    lexicon_type   lexicon_;
+    extractor_type extractor_;
 
-}; // End of class TernarySearchTree
+}; // End of class Termex
 
-#endif // ! TST_HH
+#endif // ! TERMEX_HH

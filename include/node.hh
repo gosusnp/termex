@@ -43,17 +43,6 @@ public:
         value_(0),
         key_(key)
     { }
-    template <typename T>
-    Node(char_type key, T cp = 0, value_type* value = 0) :
-        lokid_(0),
-        eqkid_(0),
-        hikid_(0),
-        value_(0),
-        key_(key)
-    {
-        if (cp)
-            insert(cp, value);
-    }
     ~Node() {
         delete lokid_;
         delete eqkid_;
@@ -61,28 +50,24 @@ public:
     }
 
     template <typename T>
-    void insert(T cp, value_type* value) {
+    value_type* insert(T cp, value_type* value, bool replace) {
         if (*cp < key_) {
-            if (lokid_) {
-                lokid_->insert(cp, value);
-            } else {
-                lokid_ = new Node(*cp, cp, value);
-            }
+            if (!this->lokid_)
+                this->lokid_ = new Node(*cp);//, cp, value, replace);
+            return lokid_->insert(cp, value, replace);
         } else if (*cp > key_) {
-            if (hikid_) {
-                hikid_->insert(cp, value);
-            } else {
-                hikid_ = new Node(*cp, cp, value);
-            }
+            if (!hikid_)
+                hikid_ = new Node(*cp);//, cp, value, replace);
+            return hikid_->insert(cp, value, replace);
         } else {
             if (*cp) {
-                if (eqkid_) {
-                    eqkid_->insert(++cp, value);
-                } else {
-                    eqkid_ = new Node(*cp, ++cp, value);
-                }
+                if (!eqkid_)
+                    eqkid_ = new Node(*cp);//, ++cp, value, replace);
+                return eqkid_->insert(++cp, value, replace);
             } else {
-                value_ = value;
+                if (value_ && !replace)
+                    return value_;
+                return value_ = value;
             }
         }
     }

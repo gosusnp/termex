@@ -67,13 +67,19 @@ void test_ternary_search_tree() {
     int oae = 6;
     int lead = 7;
 
-    tree.insert("string1", &string1);
+    assert(!tree.search("test"));
+
+    assert(tree.insert("string1", &string1) == &string1);
     tree.insert("test", &test);
     tree.insert("string2", &string2);
     tree.insert("tests", &tests);
     tree.insert("te    s", &te_s);
     tree.insert("oae    ", &oae);
     tree.insert("   lead  ", &lead);
+    assert(tree.insert("string1", &string2) == &string1);
+    assert(tree.insert("string1", &string2, true) == &string2);
+    assert(tree.search("string1") == &string2);
+    assert(tree.insert("string1", &string1, true) == &string1);
 
     assert(!tree.search("aoeuastha"));
     assert(tree.search("test") == &test);
@@ -143,29 +149,29 @@ void test_extractor() {
     extractor.extract(std::string("Test   aoeu test e tes e test   test  o test"), results);
     assert(results.size() == 6);
     extractor_type::result_list_type::iterator i = results.begin();
-    assert(std::get<0>(*i) == 0);
-    assert(std::get<1>(*i) == 4);
-    assert(std::get<2>(*i) == &test);
+    assert(i->begin == 0);
+    assert(i->end == 4);
+    assert(i->value == &test);
     ++i;
-    assert(std::get<0>(*i) == 12);
-    assert(std::get<1>(*i) == 16);
-    assert(std::get<2>(*i) == &test);
+    assert(i->begin == 12);
+    assert(i->end == 16);
+    assert(i->value == &test);
     ++i;
-    assert(std::get<0>(*i) == 25);
-    assert(std::get<1>(*i) == 29);
-    assert(std::get<2>(*i) == &test);
+    assert(i->begin == 25);
+    assert(i->end == 29);
+    assert(i->value == &test);
     ++i;
-    assert(std::get<0>(*i) == 25);
-    assert(std::get<1>(*i) == 36);
-    assert(std::get<2>(*i) == &test_test);
+    assert(i->begin == 25);
+    assert(i->end == 36);
+    assert(i->value == &test_test);
     ++i;
-    assert(std::get<0>(*i) == 32);
-    assert(std::get<1>(*i) == 36);
-    assert(std::get<2>(*i) == &test);
+    assert(i->begin == 32);
+    assert(i->end == 36);
+    assert(i->value == &test);
     ++i;
-    assert(std::get<0>(*i) == 40);
-    assert(std::get<1>(*i) == 44);
-    assert(std::get<2>(*i) == &test);
+    assert(i->begin == 40);
+    assert(i->end == 44);
+    assert(i->value == &test);
 }
 
 int main()

@@ -90,16 +90,16 @@ public:
         return *this;
     }
 
-    unsigned long offset() const
+    size_t offset() const
     {
         return offset_ - skipped_whitespaces_;
     }
 
 protected:
-    unsigned long offset_;
-    unsigned long skipped_whitespaces_;
-    const charT*  cp_;
-    charT         c_;
+    size_t       offset_;
+    size_t       skipped_whitespaces_;
+    const charT* cp_;
+    charT        c_;
 
 }; // End of class Normalizer
 

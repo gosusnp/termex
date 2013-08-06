@@ -23,7 +23,6 @@
 # define EXTRACTOR_HH
 
 # include <list>
-# include <tuple>
 
 # include "normalizer.hh"
 
@@ -38,11 +37,33 @@ class Extractor
 {
 public:
     typedef typename T::value_type                                value_type;
-    typedef std::tuple<unsigned long, unsigned long, value_type*> result_type;
+
+    struct result_type
+    {
+        result_type(size_t b, size_t e, value_type* v) :
+            begin(b),
+            end(e),
+            value(v)
+        {}
+        size_t begin;
+        size_t end;
+        value_type*   value;
+    };
+
     typedef std::list<result_type>                                result_list_type;
     typedef typename T::char_type                                 char_type;
     typedef typename T::searcher_type                             searcher_type;
-    typedef std::list< std::tuple<searcher_type, unsigned long> > searcher_list_type;
+
+    struct searcher_list_element_type
+    {
+        searcher_list_element_type(searcher_type s, size_t b) :
+            searcher(s),
+            begin(b)
+        {}
+        searcher_type searcher;
+        size_t begin;
+    };
+    typedef std::list<searcher_list_element_type>                 searcher_list_type;
 
     Extractor(const T& lexicon) :
         lexicon_(lexicon)
@@ -65,7 +86,7 @@ public:
             // See if we can start a new match
             if (current_type_of_char != 3 &&
                     (current_type_of_char != last_seen || current_type_of_char == 2)) {
-                searchers.push_back(std::make_tuple(lexicon_.searcher(), reader.offset()));
+                searchers.push_back(searcher_list_element_type(lexicon_.searcher(), reader.offset()));
             }
 
             for (typename searcher_list_type::iterator i = searchers.begin(),
@@ -73,7 +94,7 @@ public:
                     i != i_end; ) {
                 keep_match_(current_type_of_char, reader.offset(), i, results);
 
-                if (std::get<0>(*i).search(c)) {
+                if (i->searcher.search(c)) {
                     ++i;
                 } else {
                     i = searchers.erase(i);
@@ -112,15 +133,15 @@ protected:
     }
 
     void keep_match_(int current_type_of_char,
-                     unsigned long current_offset,
+                     size_t current_offset,
                      typename searcher_list_type::iterator& i,
                      result_list_type& results) const
     {
         if (current_type_of_char > 1) { // Match can occur if current is > 1
-            value_type* value = std::get<0>(*i).value();
+            value_type* value = i->searcher.value();
             if (value) {
-                results.push_back(std::make_tuple(
-                            std::get<1>(*i),
+                results.push_back(result_type(
+                            i->begin,
                             current_offset,
                             value));
             }
@@ -130,5 +151,6 @@ protected:
     const T& lexicon_;
 
 }; // End of class Extractor
+
 
 #endif // ! EXTRACTOR_HH
