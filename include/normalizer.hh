@@ -29,6 +29,7 @@
 **
 ** can be specialized with uchar to handle diactrics removal
 */
+inline
 template <typename charT>
 charT normalize(charT c) {
     return tolower(c);
@@ -85,7 +86,7 @@ public:
             }
             c_ = *cp_ ? ' ' : 0; // normalize whitespace
         } else {
-            c_ = cp_ ? normalize(*cp_) : 0; // normalize char
+            c_ = normalize(*cp_);
         }
         return *this;
     }

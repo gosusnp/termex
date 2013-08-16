@@ -54,10 +54,12 @@ public:
     template <typename T>
     inline value_type* insert(T cp, value_type* value, bool replace) {
         node_type* node = this;
+        // minimize dereferencing cp and the number of computation
+        // the normalized char
         char_type c = *cp;
+
         while (true) {
-            c = *cp;
-            if (c > node->key_) {
+            if (c > node->key_) { // c is higher go right
                 if (node->hikid_)
                     node = node->hikid_;
                 else
@@ -65,7 +67,7 @@ public:
                     node->hikid_ = new Node(c);
                     node = node->hikid_;
                 }
-            } else if (c < node->key_) {
+            } else if (c < node->key_) { // c is lower go left
                 if (node->lokid_)
                     node = node->lokid_;
                 else
@@ -73,19 +75,26 @@ public:
                     node->lokid_ = new Node(c);
                     node = node->lokid_;
                 }
-            } else {
+            } else { // key match
                 if (c) {
+                    // if c we are not at the end yet
+                    // continue reading the input string
                     if (node->eqkid_)
                     {
-                        ++cp;
                         node = node->eqkid_;
+                        c = *++cp;
                     }
                     else
-                    {
-                        node->eqkid_ = new Node(*++cp);
-                        node = node->eqkid_;
+                    {   // there are no more child all that is left
+                        // to do is create new nodes and insert new data
+                        do {
+                            node->eqkid_ = new Node(c = *++cp);
+                            node = node->eqkid_;
+                        } while (c);
+                        return node->set_value(value);
                     }
                 } else {
+                    // We are at the end, return the inserted value
                     value_type* v = node->get_value();
                     if (!v || replace)
                         return node->set_value(value);
