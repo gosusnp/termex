@@ -45,40 +45,62 @@ public:
         key_(key)
     { }
     ~Node() {
-        if (key_)          // Only delete lokid_ when key_ is not null
-            delete lokid_; // otherwise, it means that lokid_ is a value_type*
         delete eqkid_;
         delete hikid_;
+        if (key_)          // Only delete lokid_ when key_ is not null
+            delete lokid_; // otherwise, it means that lokid_ is a value_type*
     }
 
     template <typename T>
-    value_type* insert(T cp, value_type* value, bool replace) {
-        if (*cp < key_) {
-            if (!lokid_)
-                lokid_ = new Node(*cp);
-            return lokid_->insert(cp, value, replace);
-        } else if (*cp > key_) {
-            if (!hikid_)
-                hikid_ = new Node(*cp);
-            return hikid_->insert(cp, value, replace);
-        } else {
-            if (*cp) {
-                if (!eqkid_)
-                    eqkid_ = new Node(*cp);
-                return eqkid_->insert(++cp, value, replace);
+    inline value_type* insert(T cp, value_type* value, bool replace) {
+        node_type* node = this;
+        char_type c = *cp;
+        while (true) {
+            c = *cp;
+            if (c > node->key_) {
+                if (node->hikid_)
+                    node = node->hikid_;
+                else
+                {
+                    node->hikid_ = new Node(c);
+                    node = node->hikid_;
+                }
+            } else if (c < node->key_) {
+                if (node->lokid_)
+                    node = node->lokid_;
+                else
+                {
+                    node->lokid_ = new Node(c);
+                    node = node->lokid_;
+                }
             } else {
-                if (get_value() && !replace)
-                    return get_value();
-                return set_value(value);
+                if (c) {
+                    if (node->eqkid_)
+                    {
+                        ++cp;
+                        node = node->eqkid_;
+                    }
+                    else
+                    {
+                        node->eqkid_ = new Node(*++cp);
+                        node = node->eqkid_;
+                    }
+                } else {
+                    value_type* v = node->get_value();
+                    if (!v || replace)
+                        return node->set_value(value);
+                    else
+                        return v;
+                }
             }
         }
     }
 
-    value_type* get_value() const
+    inline value_type* get_value() const
     { // See implementation notes
         return reinterpret_cast<value_type*>(lokid_);
     }
-    value_type* set_value(value_type* value)
+    inline value_type* set_value(value_type* value)
     { // See implementation notes
         lokid_ = reinterpret_cast<node_type*>(value);
         return reinterpret_cast<value_type*>(lokid_);

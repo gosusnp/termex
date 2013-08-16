@@ -202,9 +202,28 @@ void test_extractor() {
     assert(i->value == &test);
 }
 
+void test_basic_build() {
+    TernarySearchTree<char, int> tree;
+
+    int test = 1;
+    int str = 2;
+    int teste = 3;
+    int tstr = 4;
+
+    tree.insert("test", &test);
+    tree.insert("str", &str);
+    tree.insert("teste", &teste);
+    tree.insert("tstr", &tstr);
+    assert(tree.search("tstr"));
+    assert(tree.search("teste"));
+    assert(tree.search("test"));
+    assert(tree.search("str"));
+}
+
 int main()
 {
     test_normalizer();
+    test_basic_build();
     test_ternary_search_tree();
     test_searcher();
     test_extractor();

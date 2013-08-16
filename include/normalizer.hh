@@ -64,11 +64,11 @@ public:
     }
     ~Normalizer() {}
 
-    operator bool() { return cp_; }
+    inline operator bool() { return cp_; }
 
-    charT operator*() { return c_; }
+    inline charT operator*() { return c_; }
 
-    Normalizer<charT>& operator++() {
+    inline Normalizer<charT>& operator++() {
         ++cp_;
         ++offset_;
         skipped_whitespaces_ = 0;
@@ -90,7 +90,7 @@ public:
         return *this;
     }
 
-    size_t offset() const
+    inline size_t offset() const
     {
         return offset_ - skipped_whitespaces_;
     }
