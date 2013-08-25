@@ -22,6 +22,8 @@
 #ifndef NODE_HH
 # define NODE_HH
 
+# include "allocator.hh"
+
 /*
 ** Node implementation for a TernarySearchTree
 **
@@ -49,6 +51,20 @@ public:
         delete hikid_;
         if (key_)          // Only delete lokid_ when key_ is not null
             delete lokid_; // otherwise, it means that lokid_ is a value_type*
+    }
+
+    typedef PoolAllocator<
+        node_type,
+        10000000, // number of objects
+        3 * sizeof (node_type*) + sizeof (char_type) // object size
+            > allocator_type;
+
+    // Use custom allocator
+    void* operator new(size_t n) {
+        return allocator_type().allocate(n);
+    }
+    void operator delete(void* p) {
+        allocator_type().deallocate(p);
     }
 
     template <typename T>
