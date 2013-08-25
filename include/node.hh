@@ -130,11 +130,13 @@ public:
         {}
         ~Searcher() {}
 
+        inline
         bool search(char_type c) {
             np_ = search_node_(c);
             return !!np_;
         }
 
+        inline
         void reset() {
             np_ = root_;
         }
@@ -144,6 +146,7 @@ public:
         ** NOTE: call entails processing that is not cached.
         **       use sparingly
         */
+        inline
         value_type* value() const
         {
             const node_type* np = search_node_(0);
@@ -152,6 +155,7 @@ public:
 
     protected:
         // Find the next node
+        inline
         const node_type* search_node_(char_type c) const
         {
             const node_type* np = np_;
@@ -183,17 +187,11 @@ public:
     template <typename T>
     value_type* search(T cp) const
     {
-        if (*cp < key_) {
-            return lokid_ ? lokid_->search(cp) : 0;
-        } else if (*cp > key_) {
-            return hikid_ ? hikid_->search(cp) : 0;
-        } else {
-            if (*cp) {
-                return eqkid_ ? eqkid_->search(++cp) : 0;
-            } else {
-                return get_value();
-            }
+        Searcher s = searcher();
+        while (*cp && s.search(*cp)) {
+            ++cp;
         }
+        return s.value();
     }
 
 protected:

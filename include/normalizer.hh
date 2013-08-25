@@ -29,7 +29,6 @@
 **
 ** can be specialized with uchar to handle diactrics removal
 */
-inline
 template <typename charT>
 charT normalize(charT c) {
     return tolower(c);
