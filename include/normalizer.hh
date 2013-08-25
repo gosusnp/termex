@@ -65,28 +65,35 @@ public:
     }
     ~Normalizer() {}
 
-    inline operator bool() { return cp_; }
+    inline operator bool() const { return cp_; }
 
-    inline charT operator*() { return c_; }
+    inline charT operator*() const { return c_; }
 
-    inline Normalizer<charT>& operator++() {
+    inline Normalizer<charT>& operator++()
+    {
+        // step forward
         ++cp_;
         ++offset_;
         skipped_whitespaces_ = 0;
-        if (cp_ && *cp_ && isspace(*cp_)) {
-            while (cp_ && *cp_ && isspace(*cp_)) {
+
+        if ((c_ = *cp_) && isspace(c_)) {
+            do { // While we have a space, skip it
                 ++cp_;
                 ++offset_;
                 ++skipped_whitespaces_;
-            }
-            if (cp_ && *cp_) {
+            } while ((c_ = *cp_) && isspace(c_));
+
+            if (c_) { // it means that !isspace(*cp_) and that we went
+                     // too far ahead
                 --cp_;
                 --offset_;
                 --skipped_whitespaces_;
+                c_ = ' ';
             }
-            c_ = *cp_ ? ' ' : 0; // normalize whitespace
+            else
+                c_ = 0;
         } else {
-            c_ = normalize(*cp_);
+            c_ = normalize(c_);
         }
         return *this;
     }
