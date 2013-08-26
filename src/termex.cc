@@ -50,13 +50,9 @@ Termex::Termex():
 Termex::~Termex()
 { }
 
-PyObject* Termex::add(const PyObject* term)
+PyObject* Termex::add(const PyObject* term, PyObject* value)
 {
-    PyObject* value = PySet_New(0);
     PyObject* result = lexicon_.insert(PyUnicode_AS_UNICODE(term), value);
-    if (value != result) {
-        Py_DECREF(value);
-    }
     Py_INCREF(result);
     return result;
 }

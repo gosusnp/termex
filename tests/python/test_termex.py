@@ -19,6 +19,18 @@ class TestPyTermex(unittest.TestCase):
         self.assertEqual(tx.get(u'value1'), tags) # ensure refcounting is good
         self.assertEqual(tx.get(u'value1'), tags) # ensure refcounting is good
 
+    def test_termex_default_value_override(self):
+        tx = PyTermex(default=list)
+        tags = tx.add(u'value1')
+        tags.append('tag1')
+        tx.add(u'value2')
+        tx.add(u'an other string')
+        self.assertEqual(tx.add(u'value1'), tags)
+        self.assertEqual(tx.get(u'value1'), tags)
+        self.assertEqual(tx.get(u'value1'), tags) # ensure refcounting is good
+        self.assertEqual(tx.get(u'value1'), tags) # ensure refcounting is good
+        self.assertEqual(tx.get(u'value1'), ['tag1'])
+
     def test_termex_get_non_existant(self):
         tx = PyTermex()
         self.assertIsNone(tx.get(u'haa'))

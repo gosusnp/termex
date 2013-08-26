@@ -27,20 +27,22 @@ cdef extern from "include/termex.hh":
     cdef cppclass Termex:
         Termex()
         list extract(string)
-        object add(string)
+        object add(string, obj)
         object get(string)
 
 
-cdef class PyTermex:
+cdef class PyTermexBase:
     cdef Termex *thisptr      # hold a C++ instance which we're wrapping
-    def __cinit__(self):
+    def __init__(self, default=set):
         self.thisptr = new Termex()
+        self._default_value_type = default
     def __dealloc__(self):
         del self.thisptr
     def add(self, term):
         if not isinstance(term, unicode):
             raise TypeError("expected unicode")
-        return self.thisptr.add(term)
+        value = self._default_value_type()
+        return self.thisptr.add(term, value)
     def get(self, term):
         if not isinstance(term, unicode):
             raise TypeError("expected unicode")
@@ -49,3 +51,6 @@ cdef class PyTermex:
         if not isinstance(inputstring, unicode):
             raise TypeError("expected unicode")
         return self.thisptr.extract(inputstring)
+
+class PyTermex(PyTermexBase):
+    pass

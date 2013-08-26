@@ -41,7 +41,7 @@ public:
     ~Termex();
 
     // Add <term> to the lexicon, returns a set of tags
-    PyObject* add(const PyObject* term);
+    PyObject* add(const PyObject* term, PyObject* value);
     // returns a set of tags of <term>
     PyObject* get(const PyObject* term) const;
     // Perform extraction returns a list of [(begin, end, set([tags])), ...]
