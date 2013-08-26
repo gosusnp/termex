@@ -57,3 +57,12 @@ class TestPyTermex(unittest.TestCase):
             tx.get('fail')
         with self.assertRaises(TypeError):
             tx.extract('fail')
+
+    def test_bug(self):
+        tx = PyTermex(default=list)
+        tx.add(u'France').append({'name': 'France'})
+        tx.add(u'United States').append({'name': 'United States'})
+        self.assertEqual(tx.extract(u'I am moving from France to the United States'),
+                [(17, 23, [{'name': 'France'}]), (31, 44, [{'name': 'United States'}])])
+        self.assertEqual(tx.extract(u'I am moving from france to the United  States.'),
+                [(17, 23, [{'name': 'France'}]), (31, 45, [{'name': 'United States'}])])
