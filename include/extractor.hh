@@ -113,7 +113,7 @@ public:
 protected:
     int get_type_of_char_(char_type c) const
     {
-        if (isalpha(c))
+        if (isalnum(c))
             return 1;
         else if (isspace(c))
             return 3;

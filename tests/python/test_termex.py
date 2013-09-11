@@ -66,3 +66,15 @@ class TestPyTermex(unittest.TestCase):
                 [(17, 23, [{'name': 'France'}]), (31, 44, [{'name': 'United States'}])])
         self.assertEqual(tx.extract(u'I am moving from france to the United  States.'),
                 [(17, 23, [{'name': 'France'}]), (31, 45, [{'name': 'United States'}])])
+
+    def test_diacritics(self):
+        tx = PyTermex(default=list)
+        tx.add(u'té').append({'name': u'té'})
+        self.assertEqual(tx.extract(u"té! C'est l'été! otéo"),
+                [(0, 2, [{'name': u'té'}])])
+
+    def test_numbers(self):
+        tx = PyTermex(default=list)
+        tx.add(u'13').append({'name': '13'})
+        self.assertEqual(tx.extract(u"2013 a13 13a 13 01310"),
+                [(13, 15, [{'name': '13'}])])
